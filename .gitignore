@@ -1,0 +1,9 @@
+# do not delete bin directory as it is needed
+[Bb]in/**
+
+# do not include floppy image
+*.img
+
+.vs
+.vscode
+.idea

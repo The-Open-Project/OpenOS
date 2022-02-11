@@ -32,7 +32,7 @@ clean:
 	rm -rf $(BINDIR)$(IMAGEFILE) $(OBJFILES) $(LOADOBJFILES)
 	@echo Done.
 
-$(BINDIR)$(IMAGEFILE): $(OBJFILES) $(LOADOBJFILES)
+$(BINDIR)$(IMAGEFILE): $(LOADOBJFILES) $(OBJFILES) 
 	@echo Linking...
 	$(LD16) -o $@ $^ $(LDFLAGS16)
 

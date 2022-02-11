@@ -3,12 +3,20 @@
 #include "./stdbool.h"
 
 extern int print_char(char c);
-extern int print_string(const char *s);
 
 struct _FILE
 {
     bool placeholder;
 };
+
+static int print_string_helper(const char *s)
+{
+    for (int i = 0; s[i] != '\0'; i++)
+    {
+        print_char(s[i]);
+    }
+    return 0;
+}
 
 int putc(int c, FILE *stream)
 {
@@ -18,12 +26,12 @@ int putc(int c, FILE *stream)
 
 int putchar(int c)
 {
-    return putc(c, NULL);
+    return putc(c, stdout);
 }
 
 int puts(const char *s)
 {
-    print_string(s);
+    print_string_helper(s);
     print_char('\n');
     return 0;
 }
@@ -55,5 +63,5 @@ int vprintf(const char *format, va_list args)
 int vfprintf(FILE *stream, const char *format, va_list args)
 {
     // ignore args list for a moment and just print format string
-    return print_string(format);
+    return print_string_helper(format);
 }

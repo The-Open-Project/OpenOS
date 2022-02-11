@@ -42,4 +42,3 @@ $(BINDIR)%.asm.kernel.o: %.asm
 $(BINDIR)%.c.kernel.o: $(SOURCEDIR)%.c
 	@echo Compiling $<...
 	$(CXX32) $(CXXFLAGS32) -c -o $@ $<
-

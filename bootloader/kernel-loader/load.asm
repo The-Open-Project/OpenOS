@@ -6,8 +6,13 @@ extern bootmain
 global entry
 
 entry:
-    mov sp, 0x1000
+    cli
+    ; setup stack
+    mov ax, ds
+    mov ss, ax
+    mov sp, 0
     mov bp, sp
+    sti
 
     call bootmain
 

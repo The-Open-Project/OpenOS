@@ -5,7 +5,7 @@
 
 _extern int bootmain(void)
 {
-    puts("Hello, baremetal world!\n");
+    puts("Hello world!\r");
 
     return 0;
 }

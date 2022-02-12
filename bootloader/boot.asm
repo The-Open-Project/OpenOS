@@ -39,6 +39,9 @@ entry:
     mov bp, 0x7C00
     mov sp, bp
 
+    mov si, STARTUP_MESSAGE
+    call print_string
+
     mov bx, KERNEL_LOADER_LOCATION
     mov dh, 50
 
@@ -176,6 +179,7 @@ disk_error:
 
     jmp halt_cpu
 
+STARTUP_MESSAGE:                db 'Startup sequence'           , 13, 10, 0
 FAILED_TO_READ_DISK_MESSAGE:    db 'Failed to read the disk.'   , 13, 10, 0
 SUCCESS_MESSAGE:                db 'File loaded.'               , 13, 10, 0
 

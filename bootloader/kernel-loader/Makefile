@@ -4,17 +4,18 @@ LD16=ia16-elf-ld
 ASM=nasm
 
 SOURCEDIR=src/
+HEADERDIR=$(SOURCEDIR)include/
 BINDIR=../../bin/
 LOADFILES=$(wildcard *.asm)
 LOADOBJFILES=$(patsubst %.asm,$(BINDIR)%.asm.ssboot.o,$(LOADFILES))
 SOURCEFILES=$(wildcard $(SOURCEDIR)*.c)
 HEADERFILES=$(wildcard $(SOURCEDIR)*.h)
-STDDEF_H=$(SOURCEDIR)stddef.h
+STDDEF_H=$(HEADERDIR)stddef.h
 OBJFILES=$(subst $(SOURCEDIR),$(BINDIR),$(SOURCEFILES:.c=.c.ssboot.o))
 IMAGEFILE=xloader
 
 CFLAGS16=-Wall -Wextra -std=c11 -ffreestanding -include"$(STDDEF_H)"
-CXXFLAGS16=-Wall -Wextra -std=c++11 -ffreestanding -include"$(STDDEF_H)"
+CXXFLAGS16=-Wall -Wextra -std=c++11 -ffreestanding -I$(HEADERDIR) -include"$(STDDEF_H)"
 LDFLAGS16=-Ttext=0x1000 --oformat binary -e entry
 ASMFLAGS=-f elf
 

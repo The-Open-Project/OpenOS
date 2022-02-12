@@ -31,7 +31,7 @@ clean:
 	rm -f $(OBJFILES) $(ASMOBJFILES) $(BINDIR)$(KERNELFILE)
 	@echo Done.
 
-$(BINDIR)$(KERNELFILE): $(OBJFILES) $(ASMOBJFILES)
+$(BINDIR)$(KERNELFILE): $(ASMOBJFILES) $(OBJFILES) 
 	@echo Linking...
 	$(LD32) -o $@ $^ $(LDFLAGS32) 
 	

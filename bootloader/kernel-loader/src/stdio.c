@@ -1,21 +1,72 @@
-#include "./stdio.h"
-#include "./stdarg.h"
-#include "./stdbool.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <priv/memdefs.h>
+#include <priv/asmdecls.h>
 
-extern int print_char(char c);
+typedef enum _FILE_MODE
+{
+    read,
+    writec,
+    append,
+    readwrite,
+    readwritec,
+    readappend,
+    readbin,
+    writecbin,
+    appendbin,
+    readtext,
+    writectext,
+    appendtext,
+    readwritebin,
+    readwritecbin,
+    readappendbin,
+    readwritetext,
+    readwritectext,
+    readappendtext
+} FILE_MODE;
 
 struct _FILE
 {
-    bool placeholder;
+    bool isopen;
+
+    FILE_MODE mode;
 };
+
+FILE *fopen(const char *file, const char *mode)
+{
+    FILE *fp = MEM_START;
+    fp->isopen = true;
+    fp->mode = readwritebin;
+
+    return fp;
+}
+
+int fclose(FILE *fp)
+{
+    if (fp)
+    {
+        if (fp->isopen)
+        {
+            fp->isopen = false;
+            fp = NULL;
+
+            return 0;
+        }
+    }
+
+    return -1;
+}
 
 static int print_string_helper(const char *s)
 {
+    int ch;
     for (int i = 0; s[i] != '\0'; i++)
     {
         print_char(s[i]);
+        ch++;
     }
-    return 0;
+    return ch;
 }
 
 int putc(int c, FILE *stream)
@@ -32,7 +83,7 @@ int putchar(int c)
 int puts(const char *s)
 {
     print_string_helper(s);
-    print_char('\n');
+    print_string_helper("\r\n");
     return 0;
 }
 

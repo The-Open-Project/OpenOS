@@ -1,3 +1,4 @@
-floppya: 1_44="openos_0.0.1a.img", status=inserted
-boot: floppy
+ata0: enabled=1
+ata0-master: type=disk, path="openos_0.0.1a.img"
+boot: disk
 display_library: wx, options=gui_debug

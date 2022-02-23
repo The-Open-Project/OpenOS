@@ -1,9 +1,8 @@
-# do not delete bin directory as it is needed
+# do not delete bin and obj directory as they are needed
 [Bb]in/**
+[Oo]bj/**
 
-# do not include floppy image
-*.img
-
-.vs
-.vscode
-.idea
+**.vscode
+**.img
+**.ini
+**.txt

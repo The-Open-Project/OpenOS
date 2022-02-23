@@ -1,44 +1,43 @@
-VERSIONNUMBER=0.0.1
-DEVSTATE=a
+SRCDIR := src/
+TOOLSDIR := tools/
+BINDIR := bin/
+OBJDIR := obj/
 
-FSBOOTLOADERDIR=bootloader/
-SSBOOTLOADERDIR=$(FSBOOTLOADERDIR)kernel-loader/
-KERNELDIR=kernel/
-BINDIR=bin/
-FSBOOTFILE=bootx
-SSBOOTFILE=xloader
-KERNELFILE=ooxk
-IMAGEFILE=openos_$(VERSIONNUMBER)$(DEVSTATE).img
+SYSNAME := openos
+VERSTRING := 0.0.1
+DEVSTAGE := a
 
-.PHONY: all image kernel ss-bootloader fs-bootloader clean force
+IMGFILE := $(SYSNAME)-$(VERSTRING)$(DEVSTAGE).img
 
-all: fs-bootloader ss-bootloader kernel image
+FSBOOTFILE := bootx
+SSBOOTFILE := xloader
+KERNELFILE := xsystem
 
-fs-bootloader:
-	make -C $(FSBOOTLOADERDIR)
+.PHONY: all system tools clean obj-check bin-check
 
-ss-bootloader:
-	make -C $(SSBOOTLOADERDIR)
+all: system tools
 
-kernel:
-	make -C $(KERNELDIR)
+system: obj-check bin-check
+	make -C $(SRCDIR)
 
-image: $(IMAGEFILE)
+	dd if=/dev/zero of=$(BINDIR)$(IMGFILE) bs=512 count=5760
+
+	mkfs.vfat -F 12 $(BINDIR)$(IMGFILE)
+
+	dd if=$(BINDIR)$(FSBOOTFILE) of=$(BINDIR)$(IMGFILE) count=1 conv=notrunc
+	dd if=$(BINDIR)$(SSBOOTFILE) of=$(BINDIR)$(IMGFILE) seek=1 count=1 conv=notrunc
+
+	mcopy -i $(BINDIR)$(IMGFILE) $(BINDIR)$(KERNELFILE) "::$(KERNELFILE)"
+
+tools: obj-check bin-check
+	make -C $(TOOLSDIR)
 
 clean:
-	@echo Cleaning up...
 	rm -rf $(BINDIR)*
-	rm -f $(IMAGEFILE)
-	@echo Done.
+	rm -rf $(OBJDIR)*
 
-force: ;
+obj-check:
+	mkdir -p obj/
 
-$(IMAGEFILE): force
-	dd if=/dev/zero of=$@ bs=512 count=2880
-	mkfs.vfat -F 12 $@
-
-	dd if=$(BINDIR)$(FSBOOTFILE) of=$@ bs=512 count=1 conv=notrunc
-	dd if=$(BINDIR)$(SSBOOTFILE) of=$@ bs=512 count=1 conv=notrunc seek=1
-
-	# Copy kernel
-	mcopy -i $@ $(BINDIR)$(KERNELFILE) "::/$(KERNELFILE)"
+bin-check:
+	mkdir -p bin/

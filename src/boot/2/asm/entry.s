@@ -1,14 +1,19 @@
 [BITS 16]
 
-section .entry
+[section .entry]
 
-extern __bss_start
-extern __end
+[extern __bss_start]
+[extern __end]
 
-extern _cstart ; C entry point
-global _start
+[extern _cstart] ; C entry point
+[global _start]
 
 _start:
+    ; clear screen first
+    mov ah, 0x00
+    mov al, 0x03
+    int 0x10
+
     cli
 
     mov [drive], dl
@@ -16,7 +21,7 @@ _start:
     mov ax, ds
     mov ss, ax
     
-    mov sp, 0x7C00
+    mov sp, 0xFFF0
     mov bp, sp
 
     call a20enable
@@ -30,11 +35,12 @@ _start:
 
     jmp dword 0x08:.pmodeex
 
-    .end:
+    cli
+    hlt
 
     [BITS 32]
     .pmodeex:
-        ; 6 - set up segment registers
+        ; set up segment registers
         mov ax, 0x10
         mov ds, ax
         mov ss, ax
@@ -43,7 +49,7 @@ _start:
         mov edi, __bss_start
         mov ecx, __end
         sub ecx, edi
-        mov al, 0
+        xor eax, eax
         cld
         rep stosb
 

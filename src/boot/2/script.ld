@@ -1,7 +1,6 @@
-OUTPUT_FORMAT(binary)
 ENTRY(_start)
 
-phys = 0x00007E00;
+phys = 0x00000500;
 
 SECTIONS
 {

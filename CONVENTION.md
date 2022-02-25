@@ -28,6 +28,10 @@ For **private** member variables and constants inside structs and classes, use t
 
 ## Functions
 
+## Global functions in assembly code
+
+In assembly, use `_<snake_case_name>` for naming global functions visible to C code, but not meant to be used by the user.
+
 ### Static functions
 
 For static functions **in translation units**, use the format: `__<camelCaseName>`. Otherwise, if defined in a class, struct, or header file, refer to the rule below.

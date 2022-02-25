@@ -1,9 +1,9 @@
 [BITS 32]
 
-section .entry
+[section .entry]
 
-extern kmain
-global _start
+[extern kmain]
+[global _start]
 
 _start:
     cli

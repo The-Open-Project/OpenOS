@@ -1,6 +1,5 @@
-# do not delete bin and obj directory as they are needed
-[Bb]in/**
-[Oo]bj/**
+[Bb]in
+[Oo]bj
 
 **.vscode
 **.img

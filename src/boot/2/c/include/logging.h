@@ -9,3 +9,4 @@ static const stream_t DEBUG_STREAM = (const stream_t)1;
 
 void plog(stream_t stream, const char *fmt, ...);
 void vplog(stream_t stream, const char *fmt, va_list args);
+void putstr(const char *str);

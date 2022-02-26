@@ -1,4 +1,4 @@
-ata0: enabled=1
-ata0-master: type=disk, path="openos_0.0.1a.img"
-boot: disk
-display_library: wx, options=gui_debug
+floppya: 1_44="bin/openos-0.0.1a.img", status=inserted
+boot: a
+
+display_library: x, options=gui_debug

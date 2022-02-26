@@ -3,4 +3,4 @@
 set -e
 
 make
-bochs -f bochsrc.txt -q
+bochs -f bochsrc.bxrc -q

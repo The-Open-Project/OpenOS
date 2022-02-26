@@ -5,6 +5,7 @@
 // default is 0x07 (light gray)
 extern uint8_t ch_color;
 
+// struct _FILE opaque
 typedef struct _FILE FILE;
 
 #define stdout (FILE*)1

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "stdarg.h"
 #include "stdio.h"
+#include <stdarg.h>
+#include <stddef.h>
 
 typedef char **stream_t;
 static const stream_t ERROR_STREAM = (const stream_t)-1;
@@ -22,5 +23,11 @@ static void panic(const char *fmt, ...) {
 
   while (1) {
     asm volatile("cli; hlt");
+  }
+}
+
+static void printBuf(const char *buf, size_t len) {
+  for (size_t i = 0; i < len; i++) {
+    printf("%s%x", i == 0 ? "0" : "", buf[i]);
   }
 }

@@ -2,6 +2,8 @@
 
 **Reminder**: use descriptive names when naming an object. This will allow others to understand the code.
 
+**Note**: the standard library is excluded from these rules.
+
 ## Constants
 
 For constants, whether static or not, use the format: `<SCREAMING_CASE_NAME>`.
@@ -54,9 +56,9 @@ For classes and structs, use: `<PascalCaseName>`.
 
 ## Macros
 
-For macros, use:  
-`_<SCREAMING_CASE_NAME>` for macros defined in translation units  
-**or**  
+For macros, use:
+`_<SCREAMING_CASE_NAME>` for macros defined in translation units
+**or**
 `<SCREAMING_CASE_NAME>` for macros in header files.
 
 ## Example

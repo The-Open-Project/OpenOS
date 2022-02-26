@@ -6,18 +6,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static uint8_t *_randomMem = (uint8_t *)0x100000;
+
 extern int _cstart(uint8_t drive) {
   plog(INFO_STREAM, "Successfully loaded second-stage bootloader\r\n");
 
-  uint8_t type;
-  uint16_t cylinders, heads, sectors;
-  _get_drive_info(drive, &type, &cylinders, &sectors, &heads);
+  DISK disk;
+  __priv__diskInit(drive, &disk);
+  __priv__diskRead(&disk, 0, 1, _randomMem);
 
-  plog(INFO_STREAM,
-       "Drive %hhu:\r\n        Type: 0x%s%hhX\r\n        Cylinders: %hu\r\n    "
-       "    Heads: "
-       "%hu\r\n        Sectors: %hu\r\n",
-       drive, type < 0x10 ? "0" : "", type, cylinders, heads, sectors);
+  printBuf(_randomMem, 512);
 
   return 0;
 }

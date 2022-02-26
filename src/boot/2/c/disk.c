@@ -45,16 +45,8 @@ extern bool _reset_drive(uint8_t drive);
 // }
 
 struct _FILE {
-  bool is_open;
+  bool isOpen;
 };
-
-typedef struct _DISK {
-  uint8_t number;
-  uint8_t type;
-  uint16_t cylinders;
-  uint16_t heads;
-  uint16_t sectors;
-} DISK;
 
 static void __lba2chs(DISK *disk, uint32_t lba, uint16_t *cylinder,
                       uint16_t *head, uint16_t *sector) {
@@ -63,7 +55,7 @@ static void __lba2chs(DISK *disk, uint32_t lba, uint16_t *cylinder,
   *sector = lba % disk->sectors + 1;
 }
 
-static void __disk_init(DISK *disk, uint8_t number) {
+static void __diskInit(DISK *disk, uint8_t number) {
   plog(INFO_STREAM, "Initializing disk %hhu\r\n", number);
 
   uint8_t type;
@@ -85,8 +77,8 @@ static void __disk_init(DISK *disk, uint8_t number) {
        number, cylinders, heads, sectors);
 }
 
-static void __disk_read(DISK *disk, uint32_t lba, uint8_t count,
-                        uint8_t *buffer) {
+static void __diskRead(DISK *disk, uint32_t lba, uint8_t count,
+                       uint8_t *buffer) {
   plog(INFO_STREAM, "Reading %hu sectors of disk %hhu\r\n", count,
        disk->number);
 
@@ -97,7 +89,7 @@ static void __disk_read(DISK *disk, uint32_t lba, uint8_t count,
   for (int i = 0; i < 3; i++) {
     if (_read_drive_sectors(disk->number, cylinder, sector, head, count,
                             buffer)) {
-      plog(INFO_STREAM, "Read %hu sectors of disk %hhu\r\n", count,
+      plog(INFO_STREAM, "Read %hu sector/s of disk %hhu\r\n", count,
            disk->number);
       return;
     }
@@ -111,4 +103,11 @@ static void __disk_read(DISK *disk, uint32_t lba, uint8_t count,
   }
 
   panic("Failed to read disk %d\r\n", disk->number);
+}
+
+void __priv__diskInit(uint8_t drive, DISK *disk) { __diskInit(disk, drive); }
+
+void __priv__diskRead(DISK *disk, uint32_t lba, uint8_t count,
+                      uint8_t *buffer) {
+  __diskRead(disk, lba, count, buffer);
 }

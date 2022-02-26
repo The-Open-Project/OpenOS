@@ -10,6 +10,12 @@ extern void _outb(uint16_t port, uint8_t data);
 extern bool _get_drive_info(uint8_t drive, uint8_t *type, uint16_t *cylinders,
                             uint16_t *sectors, uint16_t *heads);
 
+extern bool _read_drive_sectors(uint8_t drive, uint16_t cylinder,
+                                uint16_t sector, uint16_t head, uint16_t count,
+                                uint8_t *buffer);
+
+extern bool _reset_drive(uint8_t drive);
+
 // TODO: implement correct floppy disk driver
 // #define _FLOPPY_CTLR_BASE_ADDR 0x3F0
 // #define _FLOPPY_IRQ 6
@@ -50,7 +56,16 @@ typedef struct _DISK {
   uint16_t sectors;
 } DISK;
 
-static void disk_init(DISK *disk, uint8_t number) {
+static void __lba2chs(DISK *disk, uint32_t lba, uint16_t *cylinder,
+                      uint16_t *head, uint16_t *sector) {
+  *cylinder = lba / (disk->heads * disk->sectors);
+  *head = (lba / disk->sectors) % disk->heads;
+  *sector = lba % disk->sectors + 1;
+}
+
+static void __disk_init(DISK *disk, uint8_t number) {
+  plog(INFO_STREAM, "Initializing disk %hhu\r\n", number);
+
   uint8_t type;
   uint16_t cylinders;
   uint16_t heads;
@@ -66,11 +81,34 @@ static void disk_init(DISK *disk, uint8_t number) {
   disk->heads = heads;
   disk->sectors = sectors;
 
-  plog(INFO_STREAM, "Disk %d: %d cylinders, %d heads, %d sectors\r\n", number,
-       cylinders, heads, sectors);
+  plog(INFO_STREAM, "Disk %hhu: %hu cylinders, %hu heads, %hu sectors\r\n",
+       number, cylinders, heads, sectors);
 }
 
-static void disk_read(DISK *disk, uint8_t *buffer, uint32_t sector,
-                      uint16_t count) {
-  plog(INFO_STREAM, "Reading disk %d\r\n", disk->number, sector, count);
+static void __disk_read(DISK *disk, uint32_t lba, uint8_t count,
+                        uint8_t *buffer) {
+  plog(INFO_STREAM, "Reading %hu sectors of disk %hhu\r\n", count,
+       disk->number);
+
+  uint16_t cylinder, head, sector;
+
+  __lba2chs(disk, lba, &cylinder, &head, &sector);
+
+  for (int i = 0; i < 3; i++) {
+    if (_read_drive_sectors(disk->number, cylinder, sector, head, count,
+                            buffer)) {
+      plog(INFO_STREAM, "Read %hu sectors of disk %hhu\r\n", count,
+           disk->number);
+      return;
+    }
+
+    plog(INFO_STREAM, "Failed to read disk %hhu, retrying...\r\n",
+         disk->number);
+    if (!_reset_drive(disk->number)) {
+      panic("Failed to reset disk %d\r\n", disk->number);
+      return;
+    }
+  }
+
+  panic("Failed to read disk %d\r\n", disk->number);
 }

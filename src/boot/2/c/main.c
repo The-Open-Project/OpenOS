@@ -11,10 +11,13 @@ extern int _cstart(uint8_t drive) {
 
   uint8_t type;
   uint16_t cylinders, heads, sectors;
-  _get_drive_info(drive, &type, &cylinders, &heads, &sectors);
+  _get_drive_info(drive, &type, &cylinders, &sectors, &heads);
 
-  plog(INFO_STREAM, "Drive %hhu: TYPE 0x%hhX CYL %hu, HD %hu, SEC %hu\r\n",
-       type, drive, cylinders, heads, sectors);
+  plog(INFO_STREAM,
+       "Drive %hhu:\r\n        Type: 0x%s%hhX\r\n        Cylinders: %hu\r\n    "
+       "    Heads: "
+       "%hu\r\n        Sectors: %hu\r\n",
+       drive, type < 0x10 ? "0" : "", type, cylinders, heads, sectors);
 
   return 0;
 }

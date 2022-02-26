@@ -33,7 +33,7 @@ static void __putchar(const char c, unsigned char color) {
     break;
   case '\t':
     // tab stop is 8 "spaces"
-    for (unsigned long i = 0; i < (x_coord % _TABSTOP); i++)
+    for (unsigned long i = 0; i < _TABSTOP - (x_coord % _TABSTOP); i++)
       __putchar(' ', color);
     break;
   default: {

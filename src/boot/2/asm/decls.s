@@ -47,7 +47,7 @@
 %macro _PMODE2RMODEPTR 4
     mov %3, %1 ; flat address -> 32-bit intermediate register
     shr %3, 4 ; 32-bit intermediate register -> 16-bit lower half of 32-bit intermediate register
-    mov %2, ax ; 16-bit lower half of 32-bit intermediate register -> segment register
+    mov %2, %4 ; 16-bit lower half of 32-bit intermediate register -> segment register
     mov %3, %1 ; flat address -> 32-bit intermediate register
     and %3, 0x0F ; mask lower 4 bits of 32-bit intermediate register
 %endmacro
@@ -174,9 +174,10 @@ _get_drive_info:
     mov es:[si], cx
 
     mov cl, dh ; maximum head number
+    inc cx ; add 1 to head number for correct number of heads
 
     _PMODE2RMODEPTR [bp + 24], es, esi, si
-    mov es:[si], dx
+    mov es:[si], cx
 
     _PMODE32 ; switch to protected mode
 
@@ -199,23 +200,28 @@ _get_drive_info:
 _read_drive_sectors:
     enter 0, 0
 
-    push esi
     push ebx
     push es
 
     _RMODE16
 
     mov ah, 0x02 ; read sectors function
-    mov al, [bp + 24] ; num sectors
+    mov al, [bp + 16] ; sectors shift
+    and al, 0x3F ; mask lower 6 bits
+
+    mov cl, [bp + 13] ; sector number (6 bits)
+    shl cl, 6 ; shift 6 bits to the left
+    or cl, al
+
     mov dl, [bp + 8] ; drive number
     mov dh, [bp + 20] ; head
     mov ch, [bp + 12] ; cylinder (lower 8 bits, upper 2 bits discarded)
-    mov cl, [bp + 16] ; sector number (6 bits)
-    and cl, 0x3F ; mask lower 6 bits so it's only 1-63
+
+    mov al, [bp + 24] ; count of sectors to read
 
     _PMODE2RMODEPTR [bp + 28], es, ebx, bx ; convert buffer address to real mode segment:offset pair
     ; es:bx is now correctly set
-
+    stc
     int 0x13 ; call BIOS
 
     mov ax, 1
@@ -228,6 +234,27 @@ _read_drive_sectors:
 
     pop es
     pop ebx
-    pop esi
+
+    leave
+
+; param 1 - drive number
+_reset_drive:
+    enter 0, 0
+
+    ; save non-volatile registers
+    _RMODE16
+
+    mov dl, [bp + 8] ; drive number
+    mov ah, 0x00 ; reset drive function
+
+    int 0x13
+
+    mov eax, 1
+    sbb eax, 0 ; subtract with carry, if carry flag is set, eax will be 0
+    push eax ; push because it will be modified by the _PMODE32 macro
+
+    _PMODE32
+
+    pop eax ; restore eax (return value)
 
     leave
